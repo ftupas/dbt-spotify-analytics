@@ -1,0 +1,69 @@
+version: 2
+
+# db sources
+sources:
+  - name: spotify
+    schema: dbt_spotify
+    tables:
+      - name: songplays
+      - name: top_artists
+      - name: top_tracks
+
+models:
+  - name: dim_tracks
+    columns:
+      - name: track_id
+        description: Unique identifier for a track
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_artists
+    columns:
+      - name: artist_id
+        description: Unique identifier for an artist
+        tests:
+          - not_null
+          - unique
+
+  - name: dim_albums
+    columns:
+      - name: album_id
+        description: Unique identifier for an album
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_songplays
+    columns:
+      - name: songplays_id
+        description: Unique identifier for a songplay
+        tests:
+          - not_null
+          - unique
+
+  - name: fct_top_tracks
+    columns:
+      - name: track_id
+        description: Unique identifier for a track
+        tests:
+          - not_null
+          - unique
+      - name: track_rank
+        description: rank of track
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "track_rank >= 1"
+
+  - name: fct_top_artists
+    columns:
+      - name: artist_id
+        description: Unique identifier for an artist
+        tests:
+          - not_null
+          - unique
+      - name: artist_rank
+        description: rank of artist
+        tests:
+          - dbt_utils.expression_is_true:
+              expression: "artist_rank >= 1"

@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+    postgres:
+        image: postgres
+        container_name: postgres
+        restart: always
+        environment:
+          POSTGRES_USER: dbt
+          POSTGRES_PASSWORD: password1
+          POSTGRES_DB: spotify
+        ports:
+          - 5432:5432
+        networks:
+          - backend
+
+    dbt:
+        build: ./dbt .
+        container_name: dbt
+        volumes:
+          - ./data:/data
+          - ./dbt:/dbt_init
+        command: /bin/bash -c "/dbt_init/dbt_entrypoint.sh"
+        ports: 
+          - 8080:8080
+        networks:
+          - backend
+        links:
+          - postgres
+        depends_on:
+          - postgres
+
+    metabase:
+        image: metabase/metabase
+        container_name: metabase
+        restart: always
+        volumes: 
+          - ./metabase/metabase.db:/metabase.db
+        environment:
+          MB_ENCRYPTION_SECRET_KEY: abcdefghijklmnopqrstuvwxyz
+          MB_DB_FILE: /metabase.db
+        ports:
+          - 3000:3000
+        links:
+          - postgres
+        networks:
+          - backend
+        depends_on:
+          - postgres
+          - dbt
+
+networks:
+  backend:
+    driver: "bridge"

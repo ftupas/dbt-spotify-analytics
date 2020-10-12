@@ -1,0 +1,12 @@
+spotify_analytics:
+  outputs:
+    dev:
+      type: postgres
+      threads: 1
+      host: postgres
+      port: 5432
+      user: dbt
+      pass: password1
+      dbname: spotify
+      schema: dbt_spotify
+  target: dev

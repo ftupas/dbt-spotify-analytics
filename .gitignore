@@ -1,0 +1,18 @@
+# Python Environment and folders
+env
+venv
+spotify_analytics
+*.csv
+metabase.db
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Secrets
+config.py
+
+# Cached files
+.cache*
+debug.log

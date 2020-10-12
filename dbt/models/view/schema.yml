@@ -1,0 +1,26 @@
+version: 2
+
+models:
+  - name: vw_songplays_genres
+    columns:
+      - name: artist_genre
+        tests:
+          - unique
+
+  - name: vw_songplays_albums
+    columns:
+      - name: track_id
+        tests:
+          - not_null
+
+  - name: vw_top_artist_genres
+    columns:
+      - name: artist_genre
+        tests:
+          - unique
+  
+  - name: vw_top_track_genres
+    columns:
+      - name: artist_genre
+        tests:
+          - unique

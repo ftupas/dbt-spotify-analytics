@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: stg_songplays
+    columns:
+      - name: track_id
+        tests:
+          - not_null
+      - name: artist_id
+        tests:
+          - not_null
+  
+  - name: stg_top_artists
+    columns:
+      - name: artist_id
+        tests:
+          - not_null
+          - unique
+  
+  - name: stg_top_tracks
+    columns:
+      - name: track_id
+        tests:
+          - not_null
+          - unique
+      - name: artist_id
+        tests:
+          - not_null
