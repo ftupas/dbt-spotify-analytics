@@ -2,7 +2,7 @@
 {% set tables = ['stg_songplays', 'stg_top_tracks'] %}
 
 {% for table in tables %}
-    select
+    select distinct
         album_id,
         album_name,
         album_release_year,

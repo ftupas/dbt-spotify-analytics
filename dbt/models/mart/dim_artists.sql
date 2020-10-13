@@ -2,7 +2,7 @@
 {% set tables = ['stg_songplays', 'stg_top_artists', 'stg_top_tracks'] %}
 
 {% for table in tables %}
-    select
+    select distinct
         artist_id,
         artist_name,
         artist_popularity,
