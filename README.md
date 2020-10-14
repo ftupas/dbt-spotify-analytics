@@ -107,7 +107,7 @@ This shows us how the CSV files have been transformed to the fact, dimension tab
 Now that the data is loaded and transformed in our database, we may now view it in http://localhost:3000.
 You may need to login, the credentials are 
 ```
-email: dbt@spotify 
+email: dbt@spotify.com 
 password: password1
 ```
 ![login](images/metabase_login.png)
