@@ -17,6 +17,36 @@ models:
         tests:
           - not_null
           - unique
+      - name: track_name
+        description: Name of track
+        tests:
+          - not_null
+      - name: track_duration
+        description: Duration of track
+      - name: track_is_explicit
+        description: Track explicit or not
+      - name: track_popularity
+        description: How popular is the track
+      - name: track_danceability
+        description: How danceable is the track
+      - name: track_energy
+        description: Energy of track
+      - name: track_key
+        description: Key of track
+      - name: track_loudness
+        description: Loudness of track
+      - name: track_mode
+        description: Mode of track
+      - name: track_speechiness
+        description: How wordy is the track
+      - name: track_acousticness
+        description: Acousticness of the track
+      - name: track_instrumentalness
+        description: Instrumentalness of the track
+      - name: track_liveness
+        description: Liveness of track
+      - name: track_valence
+        description: Valence of track
 
   - name: dim_artists
     columns:
@@ -25,6 +55,18 @@ models:
         tests:
           - not_null
           - unique
+      - name: artist_name
+        description: Name of artist/artists
+        tests:
+          - not_null
+      - name: artist_popularity
+        description: Popularity of artist
+      - name: artist_followers
+        description: Number of followers
+      - name: artist_genre
+        description: Genre of artist
+      - name: artist_genre_others
+        description: Other genres of artist
 
   - name: dim_albums
     columns:
@@ -33,6 +75,14 @@ models:
         tests:
           - not_null
           - unique
+      - name: album_name
+        description: Name of album
+        tests:
+          - not_null
+      - name: album_release_year
+        description: Release year of album
+      - name: album_type
+        description: Type of album
 
   - name: fct_songplays
     columns:
@@ -41,27 +91,63 @@ models:
         tests:
           - not_null
           - unique
+      - name: album_id
+        description: Foreign key to albums table
+        tests:
+          - relationships:
+              to: ref('dim_albums')
+              field: album_id
+      - name: track_id
+        description: Foreign key to tracks table
+        tests:
+          - relationships:
+              to: ref('dim_tracks')
+              field: track_id
+      - name: artist_id
+        description: Foreign key to artists table
+        tests:
+          - relationships:
+              to: ref('dim_artists')
+              field: artist_id
+      - name: artist_id_others
+        description: IDs of other artists
+      - name: artist_name_others
+        description: Names of other artists
 
   - name: fct_top_tracks
     columns:
       - name: track_id
-        description: Unique identifier for a track
+        description: Foreign key to tracks table
         tests:
-          - not_null
-          - unique
+          - relationships:
+              to: ref('dim_tracks')
+              field: track_id
       - name: track_rank
         description: rank of track
         tests:
           - dbt_utils.expression_is_true:
               expression: "track_rank >= 1"
+      - name: album_id
+        description: Foreign key to albums table
+        tests:
+          - relationships:
+              to: ref('dim_albums')
+              field: album_id
+      - name: artist_id
+        description: Foreign key to artists table
+        tests:
+          - relationships:
+              to: ref('dim_artists')
+              field: artist_id
 
   - name: fct_top_artists
     columns:
       - name: artist_id
-        description: Unique identifier for an artist
+        description: Foreign key to artists table
         tests:
-          - not_null
-          - unique
+          - relationships:
+              to: ref('dim_artists')
+              field: artist_id
       - name: artist_rank
         description: rank of artist
         tests:

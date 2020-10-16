@@ -22,11 +22,10 @@ def main():
     for data, scope_dict in DATA_DICT.items():
         print(f'--GETTING {data}--')
         for query, scope in scope_dict.items():
-            df = spotifyutil.getSpotifyData(scope=scope, query=query, limit=ITEM_LIMIT)
+            df = spotifyutil.get_spotify_data(scope=scope, query=query, limit=ITEM_LIMIT)
 
             # Write data to spotify_analytics/data
-            spotifyutil.writeCSV(df=df, path=os.path.join(DATA_PATH, f'{data}.csv'))
-            DATA_DICT[data] = df
+            df.to_csv(os.path.join(DATA_PATH, f'{data}.csv'), index=False, encoding='utf-8')
     
 if __name__ == '__main__':
     main()

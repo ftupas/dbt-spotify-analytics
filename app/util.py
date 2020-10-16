@@ -2,35 +2,34 @@ import spotipy.util as util
 import pandas as pd
 import spotipy
 from datetime import datetime
-import json
 
 class SpotifyUtil:
     '''
     Utility class for accessing Spotify API
     '''
     query_dict = {
-        'current_user_recently_played': 'parseSongplays',
-        'current_user_top_artists': 'parseTopArtists',
-        'current_user_top_tracks': 'parseTopTracks'
+        'current_user_recently_played': 'parse_songplays',
+        'current_user_top_artists': 'parse_top_artists',
+        'current_user_top_tracks': 'parse_top_tracks'
     }
 
-    def __init__(self, username='', client_id='', client_secret='', redirect_uri=''):
+    def __init__(self, username, client_id, client_secret, redirect_uri):
         self.username = username
         self.client_id = client_id
         self.client_secret = client_secret
         self.redirect_uri = redirect_uri
 
-    def getSpotifyData(self, scope='', query=None, limit=None):
+    def get_spotify_data(self, scope, query, limit=50):
         '''
         Retrieves data from Spotify
         '''
-        token = self.getToken(scope=scope)
-        spotify = self.getConnection(token=token)  
+        token = self.get_token(scope=scope)
+        spotify = self.get_connection(token=token)  
         json = getattr(spotify, query)(limit=limit)
-        df = getattr(self, self.query_dict[query])(data=json, spotify=spotify)
-        return df
+        self.df = getattr(self, self.query_dict[query])(data=json, spotify=spotify)
+        return self.df
 
-    def getToken(self, scope=''):
+    def get_token(self, scope):
         '''
         Obtains the token for user authorization
         '''
@@ -41,14 +40,14 @@ class SpotifyUtil:
                                            redirect_uri=self.redirect_uri)
         return token
     
-    def getConnection(self, token=''):
+    def get_connection(self, token):
         '''
         Sets up the Spotify Connection
         '''
         spotify = spotipy.Spotify(auth=token)
         return spotify
     
-    def parseJSON(self, data=None, columns={}, *args, **kwargs):
+    def parse_json(self, data, columns, *args, **kwargs):
         '''
         Parses response data in JSON format
         '''
@@ -59,20 +58,20 @@ class SpotifyUtil:
         df = df[columns.keys()].rename(columns=columns)
         return df
     
-    def parsePrimaryAndOther(self, _list=[]):
+    def parse_primary_other(self, parse_list=[]):
         '''
         Parses primary and other values for lists
         '''
-        _list = _list.copy()
+        parse_list = parse_list.copy()
         try:
-            primary = _list.pop(0)
+            primary = parse_list.pop(0)
         except IndexError:
             primary = None
 
-        others = ", ".join(_list)
+        others = ", ".join(parse_list)
         return primary, others
 
-    def parseSongplays(self, data=None, columns=None, spotify=None):
+    def parse_songplays(self, data, spotify, columns=None):
         '''
         Parses songplays data of user
         '''
@@ -91,45 +90,42 @@ class SpotifyUtil:
                 'track.album.release_date': 'album_release_year', 
                 'track.album.type': 'album_type'
             }
-        songplays = self.parseJSON(data=data, columns=columns, result_key='items')
+        songplays = self.parse_json(data=data, columns=columns, result_key='items')
 
         # Parse artists
-        def parseArtist(artists):
+        def parse_artist(artists):
             # parse primary and other artists
-            artist_name, artist_name_others = self.parsePrimaryAndOther([artist['name'] for artist in artists])
-            artist_id, artist_id_others = self.parsePrimaryAndOther([artist['id'] for artist in artists])
+            artist_name, artist_name_others = self.parse_primary_other([artist['name'] for artist in artists])
+            artist_id, artist_id_others = self.parse_primary_other([artist['id'] for artist in artists])
             return artist_name, artist_name_others, artist_id, artist_id_others
 
         (songplays['artist_name'], songplays['artist_name_others'],
-         songplays['artist_id'], songplays['artist_id_others']) = zip(*songplays['artists'].apply(parseArtist))
+         songplays['artist_id'], songplays['artist_id_others']) = zip(*songplays['artists'].apply(parse_artist))
 
         # Get release year
-        def parseYear(album_release_year):
+        def parse_year(album_release_year):
             try:
                 year = datetime.strptime(album_release_year, '%Y-%m-%d').year
-            except:
+            except (ValueError, NameError):
                 year = datetime.strptime(album_release_year, '%Y').year
             return year
         
-        songplays['album_release_year'] = songplays['album_release_year'].apply(lambda x: parseYear(x))
+        songplays['album_release_year'] = songplays['album_release_year'].apply(lambda x: parse_year(x))
         
         # Convert timestamp
         try:
             songplays['track_played_at'] = songplays['track_played_at'] \
                                             .apply(lambda x: pd.Timestamp(x).strftime('%Y-%m-%d %H:%M:%S'))
-        except:
+        except KeyError:
             pass
 
         #Convert track duration
-        try:
-            songplays['track_duration'] = songplays['track_duration'].apply(lambda x: x/60000)
-        except:
-            pass
-
+        songplays['track_duration'] = songplays['track_duration'].apply(lambda x: x/60000)
+        
         # Get features
-        def getFeatures(key=None, method='', df=None, columns=None, result_key=None):
+        def get_features(key, method, df, columns, result_key=None):
             features = getattr(spotify, method)(df[key].values.tolist())
-            features_df = self.parseJSON(data=features, columns=columns, result_key=result_key)
+            features_df = self.parse_json(data=features, columns=columns, result_key=result_key)
             features_df.drop_duplicates(subset=key, inplace=True)
             df = df.merge(features_df, how='left', on=key)
             return df
@@ -148,7 +144,7 @@ class SpotifyUtil:
             'liveness': 'track_liveness', 
             'valence': 'track_valence'
         }
-        songplays = getFeatures(key='track_id', 
+        songplays = get_features(key='track_id', 
                                 method='audio_features', 
                                 df=songplays, 
                                 columns=track_features_columns)
@@ -160,19 +156,19 @@ class SpotifyUtil:
             'popularity': 'artist_popularity',
             'followers.total': 'artist_followers'
         }
-        songplays = getFeatures(key='artist_id', 
+        songplays = get_features(key='artist_id', 
                                 method='artists', 
                                 df=songplays, 
                                 columns=artist_features_columns,
                                 result_key='artists')
         # Parse genres
         (songplays['artist_genre'], 
-         songplays['artist_genre_others']) = zip(*songplays['artist_genres'].apply(self.parsePrimaryAndOther))
+         songplays['artist_genre_others']) = zip(*songplays['artist_genres'].apply(self.parse_primary_other))
 
         songplays.drop(columns=['artist_genres', 'artists'], axis=1, inplace=True)
         return songplays
     
-    def parseTopArtists(self, data=None, spotify=None):
+    def parse_top_artists(self, data, spotify):
         '''
         Parses top artists of user
         '''
@@ -184,16 +180,16 @@ class SpotifyUtil:
             'popularity': 'artist_popularity',
             'followers.total': 'artist_followers'
         }
-        top_artists = self.parseJSON(data=data, columns=columns, result_key='items')
+        top_artists = self.parse_json(data=data, columns=columns, result_key='items')
         
         # Parse genres
         (top_artists['artist_genre'], 
-         top_artists['artist_genre_others']) = zip(*top_artists['artist_genres'].apply(self.parsePrimaryAndOther))
+         top_artists['artist_genre_others']) = zip(*top_artists['artist_genres'].apply(self.parse_primary_other))
 
         top_artists.drop(columns=['artist_genres'], axis=1, inplace=True)
         return top_artists
 
-    def parseTopTracks(self, data=None, spotify=None):
+    def parse_top_tracks(self, data, spotify):
         '''
         Parses top tracks of user
         '''
@@ -210,11 +206,5 @@ class SpotifyUtil:
             'album.release_date': 'album_release_year', 
             'album.type': 'album_type'
         }
-        top_tracks = self.parseSongplays(data=data, columns=columns, spotify=spotify)
+        top_tracks = self.parse_songplays(data=data, spotify=spotify, columns=columns)
         return top_tracks
-
-    def writeCSV(self, df=None, path=''):
-        '''
-        Writes DataFrame to CSV
-        '''
-        df.to_csv(path, index=False, encoding='utf-8')
