@@ -15,12 +15,14 @@ services:
           - backend
 
     dbt:
-        build: ./dbt .
+        build:
+          context: ./dbt
+          dockerfile: Dockerfile
         container_name: dbt
         volumes:
           - ./data:/data
           - ./dbt:/dbt_init
-        command: /bin/bash -c "/dbt_init/dbt_entrypoint.sh"
+        command: /bin/bash -c "chmod +x /dbt_init/dbt_entrypoint.sh && /dbt_init/dbt_entrypoint.sh"
         ports: 
           - 8080:8080
         networks:
