@@ -57,10 +57,11 @@ class SpotifyUtil:
                 json_items = getattr(self.session, "playlist_items")(
                     limit=100, playlist_id=self.df.at[index, "playlist_id"]
                 )
-                playlist_items, columns = getattr(
-                    self, self.query_dict["playlist_items"]
-                )(data=json_items, playlist_id=self.df.at[index, "playlist_id"])
-                items.append(playlist_items)
+                if len(json_items['items']) > 0:
+                    playlist_items, columns = getattr(
+                        self, self.query_dict["playlist_items"]
+                    )(data=json_items, playlist_id=self.df.at[index, "playlist_id"])
+                    items.append(playlist_items)
 
             df_items = pd.concat(items, ignore_index=True)
             return self.df, df_items
@@ -94,6 +95,8 @@ class SpotifyUtil:
         if not (kwargs.get("result_key") == None):
             data = data[kwargs["result_key"]]
         df = pd.json_normalize(data).reset_index()
+        if "id" in columns:
+            df = df.dropna(subset = ["id"])
         df["index"] = df["index"] + 1
         df = df[columns.keys()].rename(columns=columns)
         return df
