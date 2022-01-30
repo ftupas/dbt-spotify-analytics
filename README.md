@@ -104,16 +104,25 @@ Navigating to http://localhost:8080 to see the documentation, we can see the lin
 This shows us how the CSV files have been transformed to the fact, dimension tables and views.
 
 ## Serve to Metabase dashboard
+
 Now that the data is loaded and transformed in our database, we may now view it in http://localhost:3000.
-You may need to login, the credentials are 
+You may need to login, the credentials are
+
 ```
-email: dbt@spotify.com 
+email: dbt@spotify.com
 password: password1
 ```
+
 ![login](images/metabase_login.png)
 
+Then you can navigate through, play around, and analyze your data.
 
-Then you can navigate through, play around, and analyze your data. Here are some sample screenshots of the dashboards
-![songplays](images/songplays.png)
+## Questions
 
-![top](images/top_artists_tracks.png)
+- What are the more common tracks in my playlists?
+- Avg length of playlists?
+- What are my favourites (most listened - top 5) genres in my playlists?
+- What are my favourites (most listened - top 10) artists in my playlists?
+- Am I born at the right decade? (more common release years of tracks in my playlists)
+- What are the two keys that please me more? (2 most commons keys on tracks in my playlists)
+- How much hipster am I? (avg popularity of tracks in my playlists)

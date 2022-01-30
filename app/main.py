@@ -5,6 +5,7 @@ import os
 ITEM_LIMIT = 50
 DATA_PATH = "data"
 DATA_DICT = {
+    "current_user_top_artists": "user-top-read",
     "current_user_recently_played": "user-read-recently-played",
     "current_user_top_tracks": "user-top-read",
     "current_user_playlists": "playlist-read-private",
@@ -19,7 +20,6 @@ def main():
         client_secret=config.CLIENT_SECRET,
         redirect_uri=config.REDIRECT_URI,
     )
-    print(f"DATA_DICT {DATA_DICT}")
 
     all_scopes = ""
     for scope in DATA_DICT.values():
