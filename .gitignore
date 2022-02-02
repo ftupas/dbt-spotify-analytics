@@ -15,3 +15,6 @@ config.py
 # Cached files
 .cache*
 debug.log
+
+.DS_Store
+*/.DS_Store
