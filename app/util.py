@@ -3,6 +3,7 @@ from time import sleep
 from typing import Union
 
 import pandas as pd
+import numpy as np
 import spotipy
 import spotipy.util as util
 
@@ -135,8 +136,11 @@ class SpotifyUtil:
         def parse_year(album_release_year: str) -> int:
             try:
                 year = datetime.strptime(album_release_year, "%Y-%m-%d").year
-            except (ValueError, NameError):
-                year = datetime.strptime(album_release_year, "%Y").year
+            except (ValueError, NameError, TypeError):
+                if album_release_year is None:
+                    year = np.nan
+                else:
+                    year = datetime.strptime(album_release_year, "%Y").year
             return year
 
         # Get features
