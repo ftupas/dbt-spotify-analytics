@@ -2,7 +2,7 @@
 with source as (
     select
         *
-    from {{ ref('top_tracks') }}
+    from {{ source('spotify', 'current_user_top_tracks') }}
 ),
 
 stage_top_tracks as (

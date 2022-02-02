@@ -1,5 +1,16 @@
 version: 2
 
+# db sources
+sources:
+  - name: spotify
+    schema: dbt_spotify
+    tables:
+      - name: current_user_playlists
+      - name: current_user_recently_played
+      - name: current_user_top_artists
+      - name: current_user_top_tracks
+      - name: playlist_items
+
 models:
   - name: stg_songplays
     columns:

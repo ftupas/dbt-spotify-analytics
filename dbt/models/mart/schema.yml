@@ -1,14 +1,5 @@
 version: 2
 
-# db sources
-sources:
-  - name: spotify
-    schema: dbt_spotify
-    tables:
-      - name: songplays
-      - name: top_artists
-      - name: top_tracks
-
 models:
   - name: dim_tracks
     columns:
