@@ -15,6 +15,12 @@ config.py
 # Cached files
 .cache*
 debug.log
-
+dbt/dbt_modules
+dbt/dbt_packages
+dbt/logs
+dbt/target
+dbt/data/.gitkeep
+settings.json
+.user.yml
 .DS_Store
 */.DS_Store
