@@ -135,12 +135,9 @@ class SpotifyUtil:
         # Get release year
         def parse_year(album_release_year: str) -> int:
             try:
-                year = datetime.strptime(album_release_year, "%Y-%m-%d").year
+                year = pd.to_datetime(album_release_year).year
             except (ValueError, NameError, TypeError):
-                if album_release_year is None:
-                    year = np.nan
-                else:
-                    year = datetime.strptime(album_release_year, "%Y").year
+                year = np.nan
             return year
 
         # Get features
