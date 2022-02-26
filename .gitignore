@@ -7,7 +7,7 @@ spotify_analytics
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-*$py.class
+*.class
 
 # Secrets
 config.py
@@ -18,3 +18,8 @@ debug.log
 
 .DS_Store
 */.DS_Store
+db/*
+dbt_target/*
+
+.vscode
+
