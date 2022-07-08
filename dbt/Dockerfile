@@ -9,6 +9,7 @@ RUN apt-get update -y && \
 
 # Install DBT
 RUN pip install -U pip
+RUN pip3 install --force-reinstall MarkupSafe==2.0.1
 RUN pip install dbt==0.18.0
 
 # Set environment variables
